@@ -18,7 +18,7 @@ impl<T: Clone + Debug> Queue<T> {
 
     pub fn enqueue(&mut self, item: T) {
         if self.is_full() {
-            self.grow();
+            self.increase_array_size();
         }
 
         self.data[self.tail] = Some(item);
@@ -36,9 +36,10 @@ impl<T: Clone + Debug> Queue<T> {
         return item;
     }
 
-    fn grow(&mut self) {
+    fn increase_array_size(&mut self) {
         let current_capacity = self.data.len();
-        let mut new_data = vec![None; current_capacity + 5];
+        let new_capacity = current_capacity + 5;
+        let mut new_data = vec![None; new_capacity];
 
         for i in 0..current_capacity {
             new_data[i] = self.data[(self.head + i) % current_capacity].take();
