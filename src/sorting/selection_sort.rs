@@ -1,18 +1,29 @@
-pub fn selection_sort<T: Ord>(vec: &mut [T]) {
-    for i in 0..vec.len()-1 {
-        // assume the `min_index` is the first element index
+pub fn selection_sort<T: Ord>(arr: &mut [T]) -> Option<&mut [T]> {
+    if arr.len() == 0 {
+        return None;
+    }
+
+    if arr.len() == 1 {
+        return Some(arr);
+    }
+
+    for i in 0..arr.len()-1 {
         let mut min_index = i;
 
-        // test against elements after `i` to find the smallest
-        for j in (i + 1)..vec.len() {
-            // if this element is less, then it's the new `min_index`
-            if vec[j] < vec[min_index] {
-                // found new minimum; remember its index
+        // find the smallest element in `arr[i + 1..n]` and keep track of its index
+        for j in (i + 1)..arr.len() {
+
+            if arr[j] < arr[min_index] {
                 min_index = j;
             }
         }
-        vec.swap(i, min_index);
+
+        // put the smaller element founded at the index `i` and the element 
+        // `arr[i]` at the index `min_index`
+        arr.swap(i, min_index);
     }
+
+    return Some(arr);
 }
 
 #[cfg(test)]
@@ -20,30 +31,50 @@ mod tests {
     use super::*;
 
     #[test]
-    fn basic() {
-        let mut res = vec!["d", "a", "c", "b"];
-        selection_sort(&mut res);
-        assert_eq!(res, vec!["a", "b", "c", "d"]);
+    fn test_already_sorted() {
+        let mut arr = vec![1, 2, 3, 4, 5];
+        let expected = vec![1, 2, 3, 4, 5];
+        let res = selection_sort(&mut arr);
+        assert_eq!(res.unwrap(), expected);
     }
 
     #[test]
-    fn empty() {
-        let mut res = Vec::<u8>::new();
-        selection_sort(&mut res);
-        assert_eq!(res, vec![]);
+    fn test_reverse_sorted() {
+        let mut arr = vec![5, 4, 3, 2, 1];
+        let expected = vec![1, 2, 3, 4, 5];
+        let res = selection_sort(&mut arr);
+        assert_eq!(res.unwrap(), expected);
     }
 
     #[test]
-    fn one_element() {
-        let mut res = vec!["a"];
-        selection_sort(&mut res);
-        assert_eq!(res, vec!["a"]);
+    fn test_random_sorted() {
+        let mut arr = vec![3, 5, 1, 4, 2];
+        let expected = vec![1, 2, 3, 4, 5];
+        let res = selection_sort(&mut arr);
+        assert_eq!(res.unwrap(), expected);
     }
 
     #[test]
-    fn pre_sorted() {
-        let mut res = vec!["a", "b", "c"];
-        selection_sort(&mut res);
-        assert_eq!(res, vec!["a", "b", "c"]);
+    fn test_duplicate_elements() {
+        let mut arr = vec![3, 5, 1, 5, 4, 2];
+        let expected = vec![1, 2, 3, 4, 5, 5];
+        let res = selection_sort(&mut arr);
+        assert_eq!(res.unwrap(), expected);
+    }
+
+    #[test]
+    fn test_edge_case_empty() {
+        let mut arr: Vec<i32> = vec![];
+        let expected = None;
+        let res = selection_sort(&mut arr);
+        assert_eq!(res, expected);
+    }
+
+    #[test]
+    fn test_edge_case_single_element() {
+        let mut arr = vec![1];
+        let expected = vec![1];
+        let res = selection_sort(&mut arr);
+        assert_eq!(res.unwrap(), expected);
     }
 }
