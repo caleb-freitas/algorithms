@@ -1,9 +1,22 @@
-pub fn merge_sort(arr: &mut [i32], p: usize, q: usize, r: usize) {
-   let left_size = q - p + 1;
+//! Bottom-up merge sort algorithm which treats the slice as an slice of n sub-slices
+/// of size 1, and **iteratively** merges sub-slices back and forth between two buffers.
+///
+/// # Arguments
+///
+/// `arr` - The slice to be sorted.
+/// `p` - 
+/// `q` - 
+/// `r` - 
+///
+/// # Return
+///
+/// The sorted array as `&mut [T]`
+pub fn bottom_up_merge_sort<T: PartialOrd>(arr: &mut [T], p: usize, q: usize, r: usize) -> &mut [T] {
+    let left_size = q - p + 1;
     let right_size = r - q;
 
-    let mut left = vec![0; left_size];
-    let mut right = vec![0; right_size];
+    let mut left = Vec::with_capacity(left_size);
+    let mut right = Vec::with_capacity(right_size);
 
     for i in 0..left_size {
         left[i] = arr[p + i];
@@ -39,4 +52,6 @@ pub fn merge_sort(arr: &mut [i32], p: usize, q: usize, r: usize) {
         right_index += 1;
         a_index += 1;
     }
+
+    return arr;
 }
