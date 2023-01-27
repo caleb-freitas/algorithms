@@ -25,7 +25,7 @@ impl<T: std::clone::Clone> Node<T> {
     }
 }
 
-impl<T: std::clone::Clone> DoublyLinkedList<T> {
+impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
     pub fn new() -> Self {
         DoublyLinkedList {
             head: None,
@@ -89,9 +89,29 @@ impl<T: std::clone::Clone> DoublyLinkedList<T> {
         }
     }
 
-    pub fn insert_at_ith(&mut self, _key: T, _index: u32) {
-
+    /// Traverse the doubly linked list starting from the head node until the end of the list
+    pub fn traverse(&self) {
+        let mut current = &self.head;
+        while let Some(node) = current {
+            println!("{:?}", node.key);
+            current = &node.next;
+        }
     }
+
+    //pub fn insert_at_ith(&mut self, _key: T, _index: u32) {}
+
+    //pub fn delete_head(&mut self) -> Option<T> {}
+
+    //pub fn delete_tail(&mut self) -> Option<T> {}
+
+    //pub fn delete_ith(&mut self, index: u32) -> Option<T> {}
+
+    //pub fn search_by_key(&mut self, key: T) -> Option<T> {}
+
+    //pub fn reverse(&mut self) -> DoublyLinkedList<T> {}
+
+    //pub fn length(&self) -> u32 {}
+    
 }
 
 #[cfg(test)]
@@ -179,6 +199,17 @@ mod tests {
         // ensures that the prev pointer of the tail node points to the right previous node
         assert_eq!(list.tail.as_ref().unwrap().prev.as_ref().unwrap().key, 0);
         assert_eq!(list.tail.as_ref().unwrap().next.as_ref(), None);
-        println!("{:#?}", list)
+    }
+
+    #[test]
+    fn traverse() {
+        let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+
+        list.insert_at_head(0);
+        list.insert_at_head(1);
+        list.insert_at_head(2);
+        list.insert_at_head(3);
+
+        list.traverse();
     }
 }
