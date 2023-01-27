@@ -419,7 +419,7 @@ mod tests {
     }
 
     #[test]
-    fn searched_key_dont_exit() {
+    fn search_key_dont_exit() {
         let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
 
         list.insert_at_head(0);
@@ -430,5 +430,22 @@ mod tests {
         let res = list.search_by_key(4);
 
         assert_eq!(res, None);
+    }
+
+    #[test]
+    fn search_key_exit() {
+        let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+
+        list.insert_at_head(0);
+        list.insert_at_head(1);
+        list.insert_at_head(2);
+        list.insert_at_head(3);
+
+        let res = list.search_by_key(1);
+
+        match res {
+            Some(node) => assert_eq!(node.key, 1),
+            None => panic!()
+        }
     }
 }
