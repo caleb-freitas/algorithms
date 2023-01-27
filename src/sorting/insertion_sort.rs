@@ -1,6 +1,6 @@
-/// Sorts a slice in-place
-/// Time complexity: O(n^2)
-/// Space complexity: O(1)
+/// Sorts a slice in-place.
+/// Time complexity: O(n^2).
+/// Space complexity: O(1).
 pub fn insertion_sort<T: PartialOrd>(s: &mut [T]) -> &mut [T]{
     // iterate over each element of the slice s[1..n], where n is the length
     for i in 1..s.len() {
