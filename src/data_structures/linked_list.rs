@@ -26,7 +26,7 @@ impl<T: std::clone::Clone> Node<T> {
     }
 }
 
-impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
+impl<T: std::clone::Clone + std::fmt::Debug + std::cmp::PartialEq> DoublyLinkedList<T> {
     pub fn new() -> Self {
         DoublyLinkedList {
             head: None,
@@ -119,6 +119,8 @@ impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
         }
     }
 
+    /// Delete the node at head. Can be used several times when using `insert_at_head`
+    /// method.
     pub fn delete_head(&mut self) -> Option<T> {
         match self.head {
             // empty list case
@@ -157,18 +159,72 @@ impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
         }
     }
 
-    //pub fn insert_at_ith(&mut self, _key: T, _index: u32) {}
+    /// Delete the node at tail. Can be used several times when using `insert_at_tail`
+    /// method.
+    pub fn delete_tail(&mut self) -> Option<T> {
+        match self.tail {
+            // empty list case
+            None => None,
 
-    //pub fn delete_tail(&mut self) -> Option<T> {}
+            // non-empty list case
+            Some(ref mut tail) => {
+                let deleted_key = tail.key.clone();
+
+                // list length >= 1
+                match tail.prev {
+                    // list length == 1
+                    None => {
+                        // both head and tail are equal to None, so the list will be empty
+                        self.head = None;
+                        self.tail = None;
+
+                        // set the new length
+                        self.length -= 1;
+                    }
+
+                    // list length > 1
+                    Some(ref mut prev) => {
+                        // update the next pointer (old tail) of the prev pointer to None
+                        prev.next = None;
+
+                        // set the new tail as the next element of the old head
+                        self.tail = Some(prev.clone());
+
+                        // set the new length
+                        self.length -= 1;
+                    }
+                }
+                return Some(deleted_key);
+            }
+        }
+    }
+
+    pub fn search_by_key(&mut self, key: T) -> Option<&Box<Node<T>>> {
+        // set current node as head (starting from head, then)
+        let mut current_node = &self.head;
+
+        // very similar code to traverse. could reuse the implementation here
+        while let Some(ref node) = current_node {
+            // check if the current node key is equal to the provided key to be
+            // searched for
+            if node.key == key {
+                // if this is the case, the return the pointer to the node
+                return Some(node);
+            }
+            // keep searching for the next until None
+            current_node = &node.next;
+        }
+
+        // otherwise return None, that is, the provided key does not exist in the
+        // current doubly linked list
+        return None;
+    }
+
+    //pub fn insert_at_ith(&mut self, _key: T, _index: u32) {}
 
     //pub fn delete_ith(&mut self, index: u32) -> Option<T> {}
 
-    //pub fn search_by_key(&mut self, key: T) -> Option<T> {}
-
     //pub fn reverse(&mut self) -> DoublyLinkedList<T> {}
-
-    //pub fn length(&self) -> u32 {}
-    
 }
 
 #[cfg(test)]
@@ -294,9 +350,31 @@ mod tests {
     }
 
     #[test]
-    fn delete_empty_list() {
+    fn delete_one_at_tail() {
+        let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+        list.insert_at_head(0);
+
+        assert_eq!(list.length, 1);
+
+        list.delete_tail();
+
+        assert_eq!(list.length, 0);
+        assert_eq!(list.head, None);
+        assert_eq!(list.tail, None);
+    }
+
+    #[test]
+    fn delete_head_empty_list() {
         let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
         let res = list.delete_head();
+        let expected = None;
+        assert_eq!(res, expected)
+    }
+    
+    #[test]
+    fn delete_tail_empty_list() {
+        let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+        let res = list.delete_tail();
         let expected = None;
         assert_eq!(res, expected)
     }
@@ -319,5 +397,38 @@ mod tests {
         // ensures that the head and tail pointes had the correct nodes
         assert_eq!(list.head.as_ref().unwrap().key, 1);
         assert_eq!(list.tail.as_ref().unwrap().key, 0);
+    }
+
+    #[test]
+    fn delete_many_at_tail() {
+        let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+
+        list.insert_at_tail(0);
+        list.insert_at_tail(1);
+        list.insert_at_tail(2);
+        list.insert_at_tail(3);
+
+        list.delete_tail();
+        list.delete_tail();
+
+        assert_eq!(list.length, 2);
+
+        // ensures that the head and tail pointes had the correct nodes
+        assert_eq!(list.head.as_ref().unwrap().key, 0);
+        assert_eq!(list.tail.as_ref().unwrap().key, 1);
+    }
+
+    #[test]
+    fn searched_key_dont_exit() {
+        let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+
+        list.insert_at_head(0);
+        list.insert_at_head(1);
+        list.insert_at_head(2);
+        list.insert_at_head(3);
+
+        let res = list.search_by_key(4);
+
+        assert_eq!(res, None);
     }
 }
