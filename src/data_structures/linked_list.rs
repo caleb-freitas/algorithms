@@ -13,6 +13,7 @@ pub struct Node<T: Clone> {
 pub struct DoublyLinkedList<T: Clone> {
     head: Option<Box<Node<T>>>,
     tail: Option<Box<Node<T>>>,
+    length: u32,
 }
 
 impl<T: std::clone::Clone> Node<T> {
@@ -30,6 +31,7 @@ impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
         DoublyLinkedList {
             head: None,
             tail: None,
+            length: 0,
         }
     }
 
@@ -45,6 +47,9 @@ impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
                 // point to the new node
                 self.head = Some(node.clone());
                 self.tail = Some(node);
+
+                // set new length
+                self.length += 1;
             }
 
             // handles a not-empty linked list
@@ -57,6 +62,9 @@ impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
                 
                 // sets the head pointer of the linked listto point to the new node
                 self.head = Some(node);
+
+                // set new length
+                self.length += 1;
             }
         }
     }
@@ -73,6 +81,9 @@ impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
                 // point to the new node
                 self.head = Some(node.clone());
                 self.tail = Some(node);
+
+                // set new length
+                self.length += 1;
             }
 
             // handles a not-empty linked list
@@ -85,6 +96,9 @@ impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
 
                 // sets the tail pointer of the list to point to the new node
                 self.tail = Some(node);
+
+                // set new length
+                self.length += 1;
             }
         }
     }
@@ -105,9 +119,45 @@ impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
         }
     }
 
-    //pub fn insert_at_ith(&mut self, _key: T, _index: u32) {}
+    pub fn delete_head(&mut self) -> Option<T> {
+        match self.head {
+            // empty list case
+            None => None,
+            
+            // verify the case when list case is greater or equal to 1
+            Some(ref mut head) => {
+                // clone the value to be deleted (head key) to return later as Option
+                let deleted_key = head.key.clone();
 
-    //pub fn delete_head(&mut self) -> Option<T> {}
+                match head.next {
+                    // case when list length is equal to 1
+                    None => {
+                        // both head and tail are equal to None, so the list will be empty
+                        self.head = None;
+                        self.tail = None;
+
+                        // set the new length
+                        self.length -= 1;
+                    }
+                    
+                    // case when list length is greater than 1
+                    Some(ref mut next) => {
+                        // update the prev (old head) of the next element to None
+                        next.prev = None;
+
+                        // set the new head as the next element of the old head
+                        self.head = Some(next.clone());
+
+                        // set the new length
+                        self.length -= 1;
+                    }
+                }
+                return Some(deleted_key);
+            }
+        }
+    }
+
+    //pub fn insert_at_ith(&mut self, _key: T, _index: u32) {}
 
     //pub fn delete_tail(&mut self) -> Option<T> {}
 
@@ -138,6 +188,7 @@ mod tests {
         let list: DoublyLinkedList<i32> = DoublyLinkedList::new();
         assert_eq!(list.tail, None);
         assert_eq!(list.head, None);
+        assert_eq!(list.length, 0);
     }
 
     #[test]
@@ -145,6 +196,8 @@ mod tests {
         let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
 
         list.insert_at_head(0);
+
+        assert_eq!(list.length, 1);
 
         // ensures that both the head and tail are the same as the new node when
         // the list is empty at the time of insertion
@@ -164,6 +217,8 @@ mod tests {
         list.insert_at_head(0);
         list.insert_at_head(1);
 
+        assert_eq!(list.length, 2);
+
         assert_eq!(list.head.as_ref().unwrap().key, 1);
         assert_eq!(list.tail.as_ref().unwrap().key, 0);
 
@@ -181,6 +236,8 @@ mod tests {
         let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
 
         list.insert_at_tail(0);
+
+        assert_eq!(list.length, 1);
 
         // ensures that both the head and tail are the same as the new node when
         // the list is empty at the time of insertion
@@ -200,6 +257,8 @@ mod tests {
         list.insert_at_tail(0);
         list.insert_at_tail(1);
 
+        assert_eq!(list.length, 2);
+        
         assert_eq!(list.head.as_ref().unwrap().key, 0);
         assert_eq!(list.tail.as_ref().unwrap().key, 1);
 
@@ -218,5 +277,47 @@ mod tests {
         list.insert_at_head(3);
 
         list.traverse();
+    }
+
+    #[test]
+    fn delete_one_at_head() {
+        let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+        list.insert_at_head(0);
+
+        assert_eq!(list.length, 1);
+
+        list.delete_head();
+
+        assert_eq!(list.length, 0);
+        assert_eq!(list.head, None);
+        assert_eq!(list.tail, None);
+    }
+
+    #[test]
+    fn delete_empty_list() {
+        let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+        let res = list.delete_head();
+        let expected = None;
+        assert_eq!(res, expected)
+    }
+
+    #[test]
+    fn delete_many_at_head() {
+
+        let mut list: DoublyLinkedList<i32> = DoublyLinkedList::new();
+
+        list.insert_at_head(0);
+        list.insert_at_head(1);
+        list.insert_at_head(2);
+        list.insert_at_head(3);
+
+        list.delete_head();
+        list.delete_head();
+
+        assert_eq!(list.length, 2);
+
+        // ensures that the head and tail pointes had the correct nodes
+        assert_eq!(list.head.as_ref().unwrap().key, 1);
+        assert_eq!(list.tail.as_ref().unwrap().key, 0);
     }
 }
