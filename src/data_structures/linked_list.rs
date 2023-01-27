@@ -91,10 +91,17 @@ impl<T: std::clone::Clone + std::fmt::Debug> DoublyLinkedList<T> {
 
     /// Traverse the doubly linked list starting from the head node until the end of the list
     pub fn traverse(&self) {
-        let mut current = &self.head;
-        while let Some(node) = current {
+        // start with the head (of course)
+        let mut current_node = &self.head;
+
+        // iterate through the linked list. the `while let` statement uses
+        // pattern matching, which means that the code block will be executed
+        // only if the `current_node` pointer is `Some`. otherwise, that is, in case the
+        // current_node is None, that will be the case of an empty doubly linked list or
+        // the next node points to None (end of list), the while terminates
+        while let Some(node) = current_node {
             println!("{:?}", node.key);
-            current = &node.next;
+            current_node = &node.next;
         }
     }
 

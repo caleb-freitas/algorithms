@@ -1,19 +1,19 @@
-pub fn insertion_sort(a: &mut [i32]) -> &mut [i32]{
-    for current in 1..a.len() {
-        // assume that key is the current element
-        let key = a[current];
+/// Sorts a slice in-place
+/// Time complexity: O(n^2)
+/// Space complexity: O(1)
+pub fn insertion_sort<T: PartialOrd>(s: &mut [T]) -> &mut [T]{
+    // iterate over each element of the slice s[1..n], where n is the length
+    for i in 1..s.len() {
+        let mut j = i;
 
-        // assume that the previous index is the current index minus 1
-        let mut previous = current - 1;
-
-        // check where in the sorted array to put the current element
-        while a[previous] > key {
-            a[previous + 1] = a[previous];
-            previous -= 1;
+        // move elements of s[0..i-1] that are greater than s[i], to one
+        // position to the right from their current position
+        while j > 0 && s[j - 1] > s[j] {
+            s.swap(j - 1, j);
+            j -= 1;
         }
-        a[previous + 1] = key;
     }
-    return a;
+    return s;
 }
 
 #[cfg(test)]
@@ -21,7 +21,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_already_sorted() {
+    fn already_sorted() {
         let mut arr = vec![1, 2, 3, 4, 5];
         let expected = vec![1, 2, 3, 4, 5];
         let res = insertion_sort(&mut arr);
@@ -29,7 +29,7 @@ mod tests {
     }
 
     #[test]
-    fn test_reverse_sorted() {
+    fn reverse_sorted() {
         let mut arr = vec![5, 4, 3, 2, 1];
         let expected = vec![1, 2, 3, 4, 5];
         let res = insertion_sort(&mut arr);
@@ -37,7 +37,7 @@ mod tests {
     }
 
     #[test]
-    fn test_random_sorted() {
+    fn random_sorted() {
         let mut arr = vec![3, 5, 1, 4, 2];
         let expected = vec![1, 2, 3, 4, 5];
         let res = insertion_sort(&mut arr);
@@ -45,7 +45,7 @@ mod tests {
     }
 
     #[test]
-    fn test_duplicate_elements() {
+    fn duplicate_elements() {
         let mut arr = vec![3, 5, 1, 5, 4, 2];
         let expected = vec![1, 2, 3, 4, 5, 5];
         let res = insertion_sort(&mut arr);
@@ -53,7 +53,7 @@ mod tests {
     }
 
     #[test]
-    fn test_edge_case_empty() {
+    fn edge_case_empty() {
         let mut arr: Vec<i32> = vec![];
         let expected = vec![];
         let res = insertion_sort(&mut arr);
@@ -61,7 +61,7 @@ mod tests {
     }
 
     #[test]
-    fn test_edge_case_single_element() {
+    fn edge_case_single_element() {
         let mut arr = vec![1];
         let expected = vec![1];
         let res = insertion_sort(&mut arr);
